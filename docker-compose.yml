@@ -1,8 +1,30 @@
 version: '3.4'
 
 services:
-  web-api:
-    image: ${DOCKER_REGISTRY-}webapi
-    build:
-      context: .
-      dockerfile: src/web-api/Dockerfile
+#  web-api:
+#    image: ${DOCKER_REGISTRY-}webapi
+#    build:
+#      context: .
+#      dockerfile: src/web-api/Dockerfile
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_pc
+    ports:
+      - '4563-4599:4563-4599'
+      - '8055:8080'
+    environment:
+      - SERVICES=${SERVICES-s3, ssm, dynamodb}
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - './.localstack:/tmp/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    ports:
+      - "4569:4569" # DynamoDB
+      - "4572:4572" # S3
+      - "4575:4575" # SNS
+      - "4576:4576" # SQS
+      - "4583:4583" # SSM
+      - "4568:4568" # Kinesis
+      - "3020:8080" # Dashboard
+      - "3021:4564" # DynamoDB Shell
